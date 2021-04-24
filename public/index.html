@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Document</title>
+    <link rel="stylesheet" href="indexcss.css">
+</head>
+<body>
+      <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 col-sm-12">
+                <h1  class="text-center">REAL TIME CHAT
+<button id="clear" class="btn btn-danger">clear</button>
+                </h1>
+                <div id="status"></div>
+                <div id="chat">
+                    <input type="text" id="username" class="form-comtrol" placeholder="Enter Name ....">
+                    <br>
+                    <div class="card">
+                        <div id="messages" class="card-block">
+                        </div>
+                    </div>
+                    <br>
+                    <textarea id="textarea" class="form-control" placeholder="Enter Message ..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js" integrity="sha512-2RDFHqfLZW8IhPRvQYmK9bTLfj/hddxGXQAred2wNZGkrKQkLGj8RCkXfRJPHlDerdHHIzTFaahq4s/P4V6Qig==" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      //  var path="127.0.0.1:8000"
+        // socket.on("connect",()=>{
+        //     console.log("connected")
+        // })
+        // socket.on("disconnect",()=>{
+        //     console.log("disconnected")
+        // })
+        // socket.on("u",(data)=>{
+        //     console.log("name"+data.name+"</br>"+"class"+data.class)
+        // })
+
+        (function(){
+            var element=(id)=>{
+                return document.getElementById(id)
+            }
+
+            var status=element("status")
+            var messages=element("messages")
+            var textarea=element("textarea")
+            var username=element("username")
+            var clearbtn=element("clear")
+            
+            var statusdefault=status.textContent
+
+            var setstatus=(s)=>{
+                status.textContent=s
+
+                if(s!==statusdefault){
+                    var delay=setTimeout(()=>{
+                        setstatus(statusdefault)
+                    },4000)
+                }
+            }
+
+         //   var socket=io.connect("127.0.0.1:1000")
+         let socket=io()
+
+            if(socket !==undefined)
+            {
+                console.log("connected  to socket")
+
+                socket.on("output",(data)=>{
+                  //  console.log(data)
+
+                  if(data.length)
+                  {
+                      for(var x=0;x<data.length;x++)
+                      {
+                          var message=document.createElement("div")
+                          message.setAttribute("class","chat-message")
+                          message.textContent=data[x].name+": "+data[x].message;
+                          messages.appendChild(message)
+                          messages.insertBefore(message,messages.firstChild)
+                      }
+                  }
+                })
+
+                socket.on("status",(data)=>{
+                    setstatus((typeof data==="object")?data.message:data)
+
+                    if(data.clear)
+                    {
+                        textarea.value=""
+                    }
+                })
+
+                textarea.addEventListener("keydown",(e)=>{
+                    if(e.which===13 && e.shiftKey==false)
+                    {
+                        socket.emit("input",{
+                            name:username.value,
+                            message:textarea.value
+                        })
+                        textarea.value=""
+                        e.preventDefault()
+                    }
+                })
+
+                clearbtn.addEventListener("click",()=>{
+                    socket.emit("clear")
+                })
+
+                socket.on("cleared",()=>{
+                    messages.textContent=" "
+                    textarea.value=""
+                    username.value=""
+                })
+            }
+        })()
+    </script>
+</body>
+</html>

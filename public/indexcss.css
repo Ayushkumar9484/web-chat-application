@@ -1,0 +1,31 @@
+#messages{
+    height: 400px;
+}
+#clear{
+    background-color: grey;
+    border-color: grey;
+    margin-left: 30px;
+    border-width: 5px;
+}
+.text-center{
+    margin-bottom: 50px;
+    margin-top: 20px;
+    color:seagreen;
+}
+#username{
+    border-width: 2px;
+    border-color:black;
+    width:400px;
+    height:40px;
+    margin-bottom: 10px;
+}
+#textarea{
+    border-width: 2px;
+    border-color: black;
+    border-radius: 50px;
+}
+.card{
+    border-width: 2px;
+    border-color: black;
+    background-color: lightskyblue;
+}
